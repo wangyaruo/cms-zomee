@@ -20,6 +20,7 @@ const categoryIds = new Map<string, string | number>()
 const productIds = new Map<string, string | number>()
 const faqIds = new Map<string, string | number>()
 const applicationIds = new Map<string, string | number>()
+const resourceIds = new Map<string, string | number>()
 const supportedImage = /\.(jpe?g|png|webp|avif)$/i
 const requiredImages = new Set<string>([
   ...source.products.map((item: any) => item.image),
@@ -181,11 +182,12 @@ for (const item of source.solutions ?? []) {
 
 for (const item of source.resources ?? []) {
   const hero = item.sourceData.artworkImages?.hero || item.sourceData.materialImages?.hero
-  await upsert('resources', 'slug', item.slug, {
+  const doc = await upsert('resources', 'slug', item.slug, {
     title: item.title.en, slug: item.slug, summary: item.summary.en, kind: item.kind,
     heroImage: hero ? await importMedia(hero, item.title.en, item.title.zh) : undefined,
     seo: { title: item.title.en, description: item.summary.en, robots: 'index' }, sourceData: item.sourceData, _status: 'published',
   }, { title: item.title.zh, summary: item.summary.zh, seo: { title: item.title.zh, description: item.summary.zh, robots: 'index' } })
+  resourceIds.set(item.slug, doc.id)
 }
 
 for (const menu of source.navigationMenus ?? []) {
@@ -204,10 +206,32 @@ for (const document of source.legalPages ?? []) {
   }, { title: document.title.zh, intro: document.intro.zh, seo: { title: document.title.zh, description: document.intro.zh, robots: 'index' } })
 }
 
+for (const page of source.sitePages ?? []) {
+  await upsert('site-pages', 'slug', page.slug, {
+    title: page.title.en, slug: page.slug, path: page.path, pageType: page.pageType, summary: page.summary.en,
+    seo: { title: page.title.en, description: page.summary.en, robots: 'index' }, sourceData: page.sourceData, _status: 'published',
+  }, { title: page.title.zh, summary: page.summary.zh, seo: { title: page.title.zh, description: page.summary.zh, robots: 'index' } })
+}
+
+for (const document of source.documents ?? []) {
+  const filePath = path.join(publicDir, document.sourcePath)
+  if (!existsSync(filePath)) throw new Error(`Missing document: ${document.sourcePath}`)
+  const data: any = { title: document.title.en, sourcePath: document.sourcePath, description: document.description.en,
+    locale: document.locale, resource: resourceIds.get(document.resourceSlug), _status: 'published' }
+  const existing = await findBy('documents', 'sourcePath', document.sourcePath)
+  const doc: any = existing
+    ? await payload.update({ collection: 'documents', id: existing.id, data, filePath, locale: 'en', overrideAccess: true, user: admin })
+    : await payload.create({ collection: 'documents', data, filePath, locale: 'en', overrideAccess: true, user: admin })
+  await payload.update({ collection: 'documents', id: doc.id, locale: 'zh', overrideAccess: true, user: admin,
+    data: { title: document.title.zh, description: document.description.zh } })
+}
+
 await payload.updateGlobal({
   slug: 'site-settings', overrideAccess: true, user: admin,
   data: { companyName: source.siteSettings.companyName, email: source.siteSettings.email,
-    phone: source.siteSettings.phone, whatsapp: source.siteSettings.phone, inquiryEndpoint: '/api/inquiry' },
+    phone: source.siteSettings.phone, whatsapp: source.siteSettings.phone, inquiryEndpoint: '/api/inquiry',
+    logo: await importMedia('/assets/legacy/zomee-logo.svg', 'ZOMEEX logo'),
+    wechatQrImage: await importMedia(source.siteSettings.wechatQrImage, 'ZOMEEX WeChat QR code', 'ZOMEEX 微信二维码') },
 })
 
 for (const faq of source.faqs) {

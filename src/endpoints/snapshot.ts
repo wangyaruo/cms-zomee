@@ -1,6 +1,6 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
-const collections = ['categories', 'products', 'posts', 'faqs', 'applications', 'solutions', 'resources', 'navigation-menus', 'legal-pages'] as const
+const collections = ['categories', 'products', 'posts', 'faqs', 'applications', 'solutions', 'resources', 'navigation-menus', 'legal-pages', 'site-pages', 'documents'] as const
 
 export function isSnapshotAuthorized(req: PayloadRequest) {
   const expected = process.env.SNAPSHOT_TOKEN

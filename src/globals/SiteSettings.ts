@@ -13,6 +13,7 @@ export const SiteSettings: GlobalConfig = {
     { name: 'phone', type: 'text', defaultValue: '+86 136 9193 5217' },
     { name: 'whatsapp', type: 'text', defaultValue: '+8613691935217' },
     { name: 'logo', type: 'upload', relationTo: 'media' },
+    { name: 'wechatQrImage', type: 'upload', relationTo: 'media' },
     { name: 'inquiryEndpoint', type: 'text', defaultValue: '/api/inquiry', required: true },
     { name: 'canonicalBaseUrl', type: 'text', admin: { description: 'Leave empty until the actual production domain is confirmed.' } },
     { name: 'defaultSeo', type: 'group', fields: [

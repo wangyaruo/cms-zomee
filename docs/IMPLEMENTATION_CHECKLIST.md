@@ -28,6 +28,8 @@
 - [ ] Dielines 文件、预览、版本与公开状态
 - [x] Navigation 菜单及页脚链接
 - [x] Legal Pages 与修订日期
+- [x] Home、About、Contact 等 7 个固定页面的数据模型与迁移
+- [x] 现有 8 份 Checklist PDF 文件管理与迁移
 - [x] 从原站导入现有真实内容
 
 ## 三、编辑体验

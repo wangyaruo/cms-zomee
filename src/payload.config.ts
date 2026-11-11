@@ -16,6 +16,8 @@ import { Pages } from './collections/Pages'
 import { Applications, Resources, Solutions } from './collections/structured'
 import { NavigationMenus } from './collections/NavigationMenus'
 import { LegalPages } from './collections/LegalPages'
+import { SitePages } from './collections/SitePages'
+import { Documents } from './collections/Documents'
 import { SiteSettings } from './globals/SiteSettings'
 import { snapshotEndpoint } from './endpoints/snapshot'
 import { createReleaseEndpoint } from './endpoints/releases'
@@ -35,7 +37,7 @@ export default buildConfig({
     components: { beforeDashboard: ['/components/CanvasLink'] },
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages],
+  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents],
   globals: [SiteSettings],
   endpoints: [snapshotEndpoint, createReleaseEndpoint],
   localization: {

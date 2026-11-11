@@ -9,6 +9,8 @@
 | Resources | 6 | 标题、slug、类型、简介、主图、SEO、完整原始结构 |
 | Navigation Menus | 2 | 菜单项、子项、中英文标签、链接、排序 |
 | Legal Pages | 2 | 标题、slug、修订日期、简介、SEO、完整法律章节 |
+| Site Pages | 7 | Home、About、Quality、Company、How We Work、Project Process、Contact |
+| Documents | 8 | 中英文 Checklist PDF、语言、关联资源、发布状态 |
 
 Resources 当前包括 Artwork、Materials、Checklists、Compliance、Dielines、Packaging Finder。
 
@@ -20,7 +22,7 @@ Applications、Solutions、Resources、Legal Pages 的 `sourceData` 保留原站
 
 ## Site Settings
 
-公司名、邮箱、电话、WhatsApp、Logo、询价接口、社交链接、默认分享图、canonical 预留地址和默认 SEO。正式域名未确认前 `canonicalBaseUrl` 保持为空。
+公司名、邮箱、电话、WhatsApp、Logo、微信二维码、询价接口、社交链接、默认分享图、canonical 预留地址和默认 SEO。Logo 与二维码已作为实际媒体关系迁移；正式域名未确认前 `canonicalBaseUrl` 保持为空。
 
 ## 迁移
 
