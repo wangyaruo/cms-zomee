@@ -30,7 +30,7 @@ const missing = [...requiredImages].filter((src) => !supportedImage.test(src) ||
 if (missing.length) throw new Error(`Missing or unsupported required images:\n${missing.join('\n')}`)
 
 async function findBy(collection: any, field: string, value: string) {
-  const result = await payload.find({ collection, where: { [field]: { equals: value } }, limit: 1, depth: 0, locale: 'all', overrideAccess: true, user: admin, showHiddenFields: true })
+  const result = await payload.find({ collection, where: { [field]: { equals: value } }, limit: 1, depth: 0, locale: 'all' as any, overrideAccess: true, user: admin, showHiddenFields: true })
   return result.docs[0]
 }
 
@@ -167,7 +167,7 @@ for (const product of source.products) {
     seo: { title: product.seoTitleZh || product.seoTitle, description: product.seoDescriptionZh || product.seoDescription, robots: indexable ? 'index' : 'noindex' },
   })
   const dual = (en: any, zh: any) => ({ en, zh: zh || en })
-  await payload.update({ collection: 'products', id: doc.id, locale: 'all', overrideAccess: true, user: admin,
+  await payload.update({ collection: 'products', id: doc.id, locale: 'all' as any, overrideAccess: true, user: admin,
     data: {
       specs: (product.specs ?? []).map((item: any) => ({ label: dual(item.label, item.labelZh), value: dual(item.value, item.valueZh) })),
       options: (product.optionGroups ?? []).map((group: any, groupIndex: number) => ({ key: group.id, label: dual(group.label, group.labelZh),
@@ -267,11 +267,46 @@ for (const document of source.legalPages ?? []) {
   }, { title: document.title.zh, intro: document.intro.zh, seo: { title: document.title.zh, description: document.intro.zh, robots: 'index' } })
 }
 
+const pageSectionPaths: Record<string, string[]> = {
+  home: ['homeSystem.packagingSystemIntro', 'homeProcess.orderProcessIntro', 'homeDimensions.packagingGuidance'],
+  about: ['aboutMedia.aboutImages.hero'],
+  'quality-supplier': ['qualityFramework.0', 'qualityFramework.1', 'qualityFramework.2', 'qualityFramework.3', 'qualityFramework.4', 'qualityFramework.5', 'supplierCriteria.0', 'supplierCriteria.1', 'supplierCriteria.2', 'supplierCriteria.3'],
+  'company-overview': ['companyInvitation', 'companyFacts.0', 'companyFacts.1', 'companyFacts.2', 'companyFacts.3'],
+  'project-process': ['projectSteps.0', 'projectSteps.1', 'projectSteps.2', 'projectSteps.3', 'projectSteps.4'],
+  contact: ['contactHeroImage'],
+}
+const valueAtPath = (source: any, sourcePath: string) => sourcePath.split('.').reduce((value, key) => value?.[key], source)
+const sectionLocale = (section: any, locale: 'en' | 'zh') => ({ ...section,
+  title: section.title?.[locale] || section.title?.en, body: section.body?.[locale] || section.body?.en,
+  linkLabel: section.linkLabel?.[locale] || section.linkLabel?.en,
+  items: section.items?.map((item: any) => ({ label: item.label?.[locale] || item.label?.en, body: item.body?.[locale] || item.body?.en })),
+})
+async function editablePageSections(page: any) {
+  const sections = []
+  for (const sourcePath of pageSectionPaths[page.slug] ?? []) {
+    const value = valueAtPath(page.sourceData, sourcePath)
+    if (value === undefined) continue
+    const pair = (en: any, zh: any) => en || zh ? { en: en || zh, zh: zh || en } : undefined
+    const imagePath = typeof value === 'string' && value.startsWith('/assets/') ? value : value.image
+    sections.push({ sourcePath,
+      title: pair(value.title?.en || value.name?.en || value.label?.en || (typeof value === 'string' ? page.title.en : undefined), value.title?.zh || value.name?.zh || value.label?.zh || (typeof value === 'string' ? page.title.zh : undefined)),
+      body: pair(value.body?.en || value.description?.en || value.intro?.en || value.response?.en, value.body?.zh || value.description?.zh || value.intro?.zh || value.response?.zh),
+      linkLabel: pair(value.cta?.en || value.action?.en, value.cta?.zh || value.action?.zh), linkHref: value.href,
+      image: imagePath && supportedImage.test(imagePath) ? await importMedia(imagePath, page.title.en, page.title.zh) : undefined,
+      items: Array.isArray(value.items) ? value.items.map((item: any) => ({ label: pair(item.label?.en || item.title?.en || item.name?.en, item.label?.zh || item.title?.zh || item.name?.zh), body: pair(item.body?.en || item.description?.en, item.body?.zh || item.description?.zh) })) : undefined,
+    })
+  }
+  return sections
+}
+
 for (const page of source.sitePages ?? []) {
-  await upsert('site-pages', 'slug', page.slug, {
+  const sections = await editablePageSections(page)
+  const doc = await upsert('site-pages', 'slug', page.slug, {
     title: page.title.en, slug: page.slug, path: page.path, pageType: page.pageType, summary: page.summary.en,
-    seo: { title: page.title.en, description: page.summary.en, robots: 'index' }, sourceData: page.sourceData, _status: 'published',
-  }, { title: page.title.zh, summary: page.summary.zh, seo: { title: page.title.zh, description: page.summary.zh, robots: 'index' } })
+    seo: { title: page.title.en, description: page.summary.en, robots: 'index' }, sourceData: page.sourceData,
+    sections: sections.map((section) => sectionLocale(section, 'en')), _status: 'published',
+  }, { title: page.title.zh, summary: page.summary.zh, seo: { title: page.title.zh, description: page.summary.zh, robots: 'index' }, sections: sections.map((section) => sectionLocale(section, 'zh')) })
+  await payload.update({ collection: 'site-pages', id: doc.id, locale: 'all' as any, overrideAccess: true, user: admin, data: { sections } as any })
 }
 
 for (const document of source.documents ?? []) {

@@ -29,6 +29,7 @@
 - [x] Navigation 菜单及页脚链接
 - [x] Legal Pages 与修订日期
 - [x] Home、About、Contact 等 7 个固定页面的数据模型与迁移
+- [x] 固定页面常用 Sections 独立表单、双语导入和前台回写
 - [x] 现有 8 份 Checklist PDF 文件管理与迁移
 - [x] 从原站导入现有真实内容
 

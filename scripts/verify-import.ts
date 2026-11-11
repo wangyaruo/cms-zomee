@@ -33,6 +33,11 @@ for (const collection of ['applications', 'solutions', 'resources', 'legal-pages
   assert(result.docs[0]?.sourceData, `${collection} must retain complete source data`)
 }
 console.log('PASS structured page source data')
+const homePage = await payload.find({ collection: 'site-pages', where: { slug: { equals: 'home' } }, locale: 'en', depth: 0, limit: 1 })
+assert(homePage.docs[0]?.sections?.length === 3, 'Home editable sections must be present')
+assert(homePage.docs[0].sections[0].title, 'Home section English copy must be present')
+const qualityPage = await payload.find({ collection: 'site-pages', where: { slug: { equals: 'quality-supplier' } }, locale: 'zh', depth: 0, limit: 1 })
+assert(qualityPage.docs[0]?.sections?.length === 10 && qualityPage.docs[0].sections[0].title, 'Quality bilingual sections must be present')
 
 const products = await payload.find({ collection: 'products', pagination: false, depth: 1, locale: 'en', overrideAccess: true, showHiddenFields: true })
 for (const product of products.docs) {
@@ -47,7 +52,7 @@ assert((sample.sourceData as any)?.optionGroups?.length, 'Complex product option
 assert(sample.heroTitle, 'Complex PDP hero title must be editable')
 assert(sample.galleryDetails?.length, 'Gallery captions must be editable')
 assert(sample.assurance?.length && sample.highlights?.length, 'Assurance and highlights must be editable')
-assert(sample.assurance[0].label && sample.customOptions[0]?.name, 'English PDP array content must be present')
+assert(sample.assurance[0].label && sample.customOptions?.[0]?.name, 'English PDP array content must be present')
 assert(sample.customOptions?.length, 'Custom options must be editable')
 assert(sample.featureCard?.items?.length, 'Feature card items must be editable')
 assert(sample.compliance?.capabilities?.length, 'Compliance capabilities must be editable')
