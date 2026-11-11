@@ -20,5 +20,6 @@ export const Media: CollectionConfig = {
     { name: 'alt', type: 'text', required: true, localized: true },
     { name: 'caption', type: 'text', localized: true },
     { name: 'credit', type: 'text' },
+    { name: 'sourcePath', type: 'text', unique: true, admin: { readOnly: true, description: 'Original asset path used for idempotent migration.' } },
   ],
 }

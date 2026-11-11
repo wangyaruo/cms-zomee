@@ -18,13 +18,13 @@ export const Products: CollectionConfig = {
           fields: [
             { name: 'name', type: 'text', required: true, localized: true },
             slugField,
-            { name: 'sku', type: 'text', unique: true, admin: { description: 'Leave empty when the source catalog has no SKU.' } },
+            { name: 'sku', type: 'text', index: true, admin: { description: 'Source SKUs are indexed but not forced unique; legacy duplicates are preserved.' } },
             { name: 'summary', type: 'textarea', localized: true },
             { name: 'description', type: 'richText', localized: true },
             { name: 'image', type: 'upload', relationTo: 'media', required: true },
             { name: 'gallery', type: 'upload', relationTo: 'media', hasMany: true },
             {
-              name: 'categories', type: 'relationship', relationTo: 'categories', hasMany: true, required: true,
+              name: 'categories', type: 'relationship', relationTo: 'categories', hasMany: true,
               filterOptions: () => ({ _status: { equals: 'published' } }),
             },
             {
@@ -57,6 +57,7 @@ export const Products: CollectionConfig = {
           fields: [
             { name: 'relatedProducts', type: 'relationship', relationTo: 'products', hasMany: true },
             { name: 'faqs', type: 'relationship', relationTo: 'faqs', hasMany: true },
+            { name: 'sourceData', type: 'json', admin: { hidden: true, description: 'Unmapped original PDP fields retained for the frontend adapter.' } },
           ],
         },
         { label: 'SEO', fields: [seoFields] },

@@ -23,5 +23,5 @@ export const Posts: CollectionConfig = {
     { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text', required: true, localized: true }] },
     { name: 'relatedProducts', type: 'relationship', relationTo: 'products', hasMany: true },
     seoFields,
-  ],
+    { name: 'sourceData', type: 'json', admin: { hidden: true, description: 'Original editorial modules retained for the frontend adapter.' } },  ],
 }

@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { getPayload } from 'payload'
+import config from '../src/payload.config'
+
+const source = JSON.parse(await readFile(path.resolve(process.env.ORIGINAL_CONTENT_FILE || 'import/original-content.json'), 'utf8'))
+const payload = await getPayload({ config })
+
+for (const [collection, key, records, sourceKey] of [
+  ['categories', 'slug', source.categories, 'slug'],
+  ['products', 'slug', source.products, 'slug'],
+  ['posts', 'slug', source.posts, 'slug'],
+  ['faqs', 'stableKey', source.faqs, 'id'],
+] as const) {
+  for (const record of records) {
+    const identity = record[sourceKey]
+    const result = await payload.find({ collection, where: { [key]: { equals: identity } }, limit: 1, depth: 0, overrideAccess: true, showHiddenFields: true })
+    assert.equal(result.totalDocs, 1, `${collection}/${identity} must exist exactly once`)
+  }
+  console.log(`PASS ${collection}: ${records.length} unique source records`)
+}
+
+const products = await payload.find({ collection: 'products', pagination: false, depth: 1, locale: 'en', overrideAccess: true, showHiddenFields: true })
+for (const product of products.docs) {
+  assert(product.image, `${product.slug} requires an image`)
+  const legacy = product.sourceData as any
+  if (legacy.family === 'packaging') assert(product.categories?.length, `${product.slug} requires a category`)
+  assert(product.sourceData, `${product.slug} must retain original PDP data`)
+}
+const sample = products.docs.find((product) => product.slug === '3-5g-child-resistant-mylar-bags')
+assert(sample, 'The complex sample product must exist')
+assert((sample.sourceData as any)?.optionGroups?.length, 'Complex product options must survive migration')
+const sampleZh = await payload.findByID({ collection: 'products', id: sample.id, locale: 'zh', depth: 0, overrideAccess: true, showHiddenFields: true })
+assert.equal(sampleZh.name, source.products.find((product: any) => product.slug === sample.slug).nameZh)
+console.log('PASS product media, categories, source fields and Chinese content')
+
+const posts = await payload.find({ collection: 'posts', pagination: false, depth: 0, overrideAccess: true })
+assert.equal(posts.docs.filter((post) => post._status === 'published').length, source.posts.filter((post: any) => post.editorial.status === 'published').length)
+console.log('PASS blog publication boundaries')
+
+const media = await payload.find({ collection: 'media', pagination: false, depth: 0, overrideAccess: true })
+const sourcePaths = media.docs.map((item) => item.sourcePath).filter(Boolean)
+assert.equal(new Set(sourcePaths).size, sourcePaths.length, 'Media source paths must be unique')
+console.log(`PASS ${sourcePaths.length} deduplicated imported media assets`)
+process.exit(0)

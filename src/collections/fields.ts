@@ -16,8 +16,8 @@ export const seoFields: GroupField = {
   type: 'group',
   label: 'SEO',
   fields: [
-    { name: 'title', type: 'text', localized: true, maxLength: 70 },
-    { name: 'description', type: 'textarea', localized: true, maxLength: 180 },
+    { name: 'title', type: 'text', localized: true, maxLength: 200 },
+    { name: 'description', type: 'textarea', localized: true, maxLength: 500 },
     { name: 'image', type: 'upload', relationTo: 'media' },
     {
       name: 'robots',
