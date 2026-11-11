@@ -1,0 +1,38 @@
+{
+  "name": "zomeex-cms",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3100",
+    "build": "next build",
+    "start": "next start --port 3100",
+    "payload": "payload",
+    "generate:importmap": "payload generate:importmap",
+    "generate:types": "payload generate:types",
+    "seed": "node --env-file=.env --import tsx scripts/seed.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:smoke": "node --env-file=.env --import tsx scripts/smoke.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@payloadcms/db-sqlite": "3.93.0",
+    "@payloadcms/next": "3.93.0",
+    "@payloadcms/richtext-lexical": "3.93.0",
+    "next": "16.4.6",
+    "payload": "3.93.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "^22.23.4 || >=24.22.1"
+  }
+}

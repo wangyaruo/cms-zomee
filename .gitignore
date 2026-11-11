@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.next-*/
+.env
+.env.*
+!.env.example
+data/
+media/*
+!media/.gitkeep
+*.tsbuildinfo
+next-env.d.ts
+src/payload-types.ts
+.DS_Store
+coverage/
