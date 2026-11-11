@@ -22,12 +22,12 @@
 - [x] Blog Posts：标题、摘要、正文、话题、作者、日期、封面、关联产品
 - [x] FAQs：稳定 ID、多语言问答、产品／分类关联、排序、审核日期、发布状态
 - [x] Site Settings：公司信息、联系方式、社交链接、默认分享图
-- [ ] Applications 与产品推荐理由
-- [ ] Solutions 与关联产品／应用
-- [ ] Resources 与私有文件发放
+- [x] Applications 与产品推荐理由
+- [x] Solutions 与关联产品／应用
+- [x] Resources 内容模型与迁移（私有文件发放待完成）
 - [ ] Dielines 文件、预览、版本与公开状态
-- [ ] Navigation 菜单及页脚链接
-- [ ] Legal Pages 与修订日期
+- [x] Navigation 菜单及页脚链接
+- [x] Legal Pages 与修订日期
 - [x] 从原站导入现有真实内容
 
 ## 三、编辑体验

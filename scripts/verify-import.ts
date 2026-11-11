@@ -12,6 +12,11 @@ for (const [collection, key, records, sourceKey] of [
   ['products', 'slug', source.products, 'slug'],
   ['posts', 'slug', source.posts, 'slug'],
   ['faqs', 'stableKey', source.faqs, 'id'],
+  ['applications', 'slug', source.applications, 'slug'],
+  ['solutions', 'slug', source.solutions, 'slug'],
+  ['resources', 'slug', source.resources, 'slug'],
+  ['navigation-menus', 'slug', source.navigationMenus, 'slug'],
+  ['legal-pages', 'slug', source.legalPages, 'slug'],
 ] as const) {
   for (const record of records) {
     const identity = record[sourceKey]
@@ -20,6 +25,12 @@ for (const [collection, key, records, sourceKey] of [
   }
   console.log(`PASS ${collection}: ${records.length} unique source records`)
 }
+
+for (const collection of ['applications', 'solutions', 'resources', 'legal-pages'] as const) {
+  const result = await payload.find({ collection, limit: 1, depth: 0, overrideAccess: true, showHiddenFields: true })
+  assert(result.docs[0]?.sourceData, `${collection} must retain complete source data`)
+}
+console.log('PASS structured page source data')
 
 const products = await payload.find({ collection: 'products', pagination: false, depth: 1, locale: 'en', overrideAccess: true, showHiddenFields: true })
 for (const product of products.docs) {

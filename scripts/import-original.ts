@@ -19,6 +19,7 @@ const mediaIds = new Map<string, string | number>()
 const categoryIds = new Map<string, string | number>()
 const productIds = new Map<string, string | number>()
 const faqIds = new Map<string, string | number>()
+const applicationIds = new Map<string, string | number>()
 const supportedImage = /\.(jpe?g|png|webp|avif)$/i
 const requiredImages = new Set<string>([
   ...source.products.map((item: any) => item.image),
@@ -158,6 +159,56 @@ for (const post of source.posts) {
     seo: { title: post.titleZh, description: post.excerptZh, robots: post.editorial.status === 'published' ? 'index' : 'noindex' },
   })
 }
+
+for (const item of source.applications ?? []) {
+  const doc = await upsert('applications', 'slug', item.slug, {
+    title: item.title.en, slug: item.slug, summary: item.description.en, heroImage: item.image ? await importMedia(item.image, item.title.en, item.title.zh) : undefined,
+    products: (item.products ?? []).map((entry: any) => productIds.get(entry.productSlug)).filter(Boolean),
+    faqs: (item.faqIds ?? []).map((id: string) => faqIds.get(id)).filter(Boolean),
+    seo: { title: item.title.en, description: item.description.en, robots: 'index' }, sourceData: item, _status: 'published',
+  }, { title: item.title.zh, summary: item.description.zh, seo: { title: item.title.zh, description: item.description.zh, robots: 'index' } })
+  applicationIds.set(item.slug, doc.id)
+}
+
+for (const item of source.solutions ?? []) {
+  await upsert('solutions', 'slug', item.slug, {
+    title: item.h1.en, slug: item.slug, summary: item.summary.en, heroImage: item.image ? await importMedia(item.image, item.h1.en, item.h1.zh) : undefined,
+    products: (item.productSlugs ?? []).map((slug: string) => productIds.get(slug)).filter(Boolean),
+    applications: (item.applicationSlugs ?? []).map((slug: string) => applicationIds.get(slug)).filter(Boolean),
+    seo: { title: item.seoTitle.en, description: item.metaDescription.en, robots: 'index' }, sourceData: item, _status: 'published',
+  }, { title: item.h1.zh, summary: item.summary.zh, seo: { title: item.seoTitle.zh, description: item.metaDescription.zh, robots: 'index' } })
+}
+
+for (const item of source.resources ?? []) {
+  const hero = item.sourceData.artworkImages?.hero || item.sourceData.materialImages?.hero
+  await upsert('resources', 'slug', item.slug, {
+    title: item.title.en, slug: item.slug, summary: item.summary.en, kind: item.kind,
+    heroImage: hero ? await importMedia(hero, item.title.en, item.title.zh) : undefined,
+    seo: { title: item.title.en, description: item.summary.en, robots: 'index' }, sourceData: item.sourceData, _status: 'published',
+  }, { title: item.title.zh, summary: item.summary.zh, seo: { title: item.title.zh, description: item.summary.zh, robots: 'index' } })
+}
+
+for (const menu of source.navigationMenus ?? []) {
+  const localizeItems = (locale: 'en' | 'zh') => menu.items.map((item: any) => ({
+    ...item, label: item.label[locale], children: (item.children ?? []).map((child: any) => ({ ...child, label: child.label[locale] })),
+  }))
+  await upsert('navigation-menus', 'slug', menu.slug,
+    { name: menu.name, slug: menu.slug, items: localizeItems('en'), _status: 'published' },
+    { items: localizeItems('zh') })
+}
+
+for (const document of source.legalPages ?? []) {
+  await upsert('legal-pages', 'slug', document.slug, {
+    title: document.title.en, slug: document.slug, revision: document.revision, intro: document.intro.en,
+    seo: { title: document.title.en, description: document.intro.en, robots: 'index' }, sourceData: document, _status: 'published',
+  }, { title: document.title.zh, intro: document.intro.zh, seo: { title: document.title.zh, description: document.intro.zh, robots: 'index' } })
+}
+
+await payload.updateGlobal({
+  slug: 'site-settings', overrideAccess: true, user: admin,
+  data: { companyName: source.siteSettings.companyName, email: source.siteSettings.email,
+    phone: source.siteSettings.phone, whatsapp: source.siteSettings.phone, inquiryEndpoint: '/api/inquiry' },
+})
 
 for (const faq of source.faqs) {
   const id = faqIds.get(faq.id)

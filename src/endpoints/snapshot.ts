@@ -1,6 +1,6 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
-const collections = ['categories', 'products', 'posts', 'faqs'] as const
+const collections = ['categories', 'products', 'posts', 'faqs', 'applications', 'solutions', 'resources', 'navigation-menus', 'legal-pages'] as const
 
 export function isSnapshotAuthorized(req: PayloadRequest) {
   const expected = process.env.SNAPSHOT_TOKEN
@@ -15,7 +15,7 @@ export async function captureSnapshot(req: PayloadRequest, preview = false, sele
     })
     content[collection] = result.docs.filter((doc) => preview || doc._status === 'published').map((doc) => {
       const publicDoc = { ...doc } as Record<string, unknown>
-      delete publicDoc.sourceData
+      if (collection === 'products' || collection === 'posts') delete publicDoc.sourceData
       return publicDoc
     })
   }
