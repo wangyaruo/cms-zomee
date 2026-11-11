@@ -316,7 +316,7 @@ for (const document of source.documents ?? []) {
     locale: document.locale, resource: resourceIds.get(document.resourceSlug), _status: 'published' }
   const existing = await findBy('documents', 'sourcePath', document.sourcePath)
   const doc: any = existing
-    ? await payload.update({ collection: 'documents', id: existing.id, data, filePath, locale: 'en', overrideAccess: true, user: admin })
+    ? await payload.update({ collection: 'documents', id: existing.id, data, locale: 'en', overrideAccess: true, user: admin })
     : await payload.create({ collection: 'documents', data, filePath, locale: 'en', overrideAccess: true, user: admin })
   await payload.update({ collection: 'documents', id: doc.id, locale: 'zh', overrideAccess: true, user: admin,
     data: { title: document.title.zh, description: document.description.zh } })
