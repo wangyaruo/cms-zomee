@@ -38,7 +38,7 @@ CMS_RELEASE_ID=RELEASE_ID \
 npm run build
 ```
 
-`CMS_RELEASE_ID` 与草稿预览互斥。构建只生成本地产物，尚不代表已经部署。生产部署与一键回滚仍需要服务器发布脚本和部署权限。
+`CMS_RELEASE_ID` 与草稿预览互斥。构建只生成本地产物，尚不代表已经部署。原站仓库 `deploy/deploy-release.sh` 和 `deploy/rollback-release.sh` 提供候选健康检查、失败恢复和按版本切换；需要目标服务器的 Docker 与目录权限。
 
 ## 验证
 
