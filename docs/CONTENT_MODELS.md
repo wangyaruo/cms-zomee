@@ -20,6 +20,12 @@ Applications、Solutions、Resources、Legal Pages 的 `sourceData` 保留原站
 
 产品和文章快照继续移除 `sourceData`，因为原站已有这些记录作为回退，避免重复传输。其他结构化页面保留该字段。
 
+## 复杂 PDP 编辑
+
+Products 的 PDP Content 页提供 Hero、图库说明、徽章、保障项、亮点、选项图片、定制项、结构说明卡、合规模块、底部 CTA 和 Documents 关联。
+
+双语数组必须通过 `locale=all` 一次写入 `{en, zh}`。不能先写英文数组再写中文数组，否则 Payload 会替换数组并丢失另一种语言。`import:original` 已采用原子双语更新。
+
 ## Site Settings
 
 公司名、邮箱、电话、WhatsApp、Logo、微信二维码、询价接口、社交链接、默认分享图、canonical 预留地址和默认 SEO。Logo 与二维码已作为实际媒体关系迁移；正式域名未确认前 `canonicalBaseUrl` 保持为空。

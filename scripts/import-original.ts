@@ -101,16 +101,42 @@ for (const product of source.products) {
   for (const src of product.gallery ?? []) {
     if (supportedImage.test(src) && existsSync(path.join(publicDir, src))) gallery.push(await importMedia(src, product.name, product.nameZh))
   }
+  const galleryDetails: any[] = []
+  for (const [index, detail] of (product.galleryDetails ?? []).entries()) {
+    const src = product.gallery?.[index] || product.image
+    galleryDetails.push({ title: detail.title, description: detail.description,
+      image: supportedImage.test(src) ? await importMedia(src, detail.title || product.name, detail.titleZh || product.nameZh) : undefined })
+  }
+  const optionGroups: any[] = []
+  for (const group of product.optionGroups ?? []) {
+    const choices = []
+    for (const choice of group.choices ?? []) {
+      const src = choice.image || choice.src || choice.images?.[0]
+      choices.push({ value: choice.value, label: choice.value, note: choice.note || '', customInquiry: Boolean(choice.custom),
+        image: src && supportedImage.test(src) ? await importMedia(src, choice.value, choice.valueZh || choice.value) : undefined })
+    }
+    optionGroups.push({ key: group.id, label: group.label, choices })
+  }
   const doc = await upsert('products', 'slug', product.slug, {
     name: product.name, slug: product.slug, sku: product.sku || undefined,
     summary: product.description || '', description: richTextFromParagraphs(product.description ? [product.description] : []),
     image: await importMedia(product.image, product.name, product.nameZh), gallery,
     categories: (product.categories ?? []).map((slug: string) => categoryIds.get(slug)).filter(Boolean),
     specs: (product.specs ?? []).map((spec: any) => ({ label: spec.label, value: spec.value })),
-    options: (product.optionGroups ?? []).map((group: any) => ({
-      key: group.id, label: group.label,
-      choices: (group.choices ?? []).map((choice: any) => ({ value: choice.value, label: choice.value, note: choice.note || '', customInquiry: Boolean(choice.custom) })),
-    })),
+    options: optionGroups,
+    heroTitle: product.heroTitle, heroIntro: product.heroIntro, quoteLabel: product.quoteLabel, dielineLabel: product.dielineLabel,
+    detailTitle: product.detailTitle, detailParagraphs: (product.detailParagraphs ?? []).join('\n'), galleryDetails,
+    badges: (product.badges ?? []).map((item: any) => ({ label: item.label, tone: item.tone })),
+    assurance: (product.assurance ?? []).map((item: any) => ({ icon: item.icon, label: item.label })),
+    highlights: (product.highlights ?? []).map((item: any) => ({ icon: item.icon, label: item.label })),
+    customOptionsTitle: product.customOptionsTitle, customOptionsIntro: product.customOptionsIntro,
+    customOptions: (product.customOptions ?? []).map((item: any) => ({ name: item.name, description: item.description })),
+    featureCard: product.featureCard ? { title: product.featureCard.title, body: product.featureCard.body, diagram: product.featureCard.diagram,
+      items: (product.featureCard.items ?? []).map((item: any) => ({ title: item.title, body: item.body })) } : undefined,
+    compliance: product.compliance ? { title: product.compliance.title, body: product.compliance.body,
+      capabilities: (product.compliance.capabilities ?? []).map((item: any) => ({ title: item.title, body: item.body })) } : undefined,
+    closingCta: product.closingCta ? { title: product.closingCta.title, body: product.closingCta.body,
+      quoteLabel: product.closingCta.quoteLabel, secondaryLabel: product.closingCta.secondaryLabel, secondaryRequest: product.closingCta.secondaryRequest } : undefined,
     faqs: (product.productFaqs ?? []).map((faq: any) => faqIds.get(faq.id)).filter(Boolean),
     seo: { title: product.seoTitle, description: product.seoDescription, robots: indexable ? 'index' : 'noindex' },
     contentStatus: status, sourceData: product, _status: 'published',
@@ -118,12 +144,47 @@ for (const product of source.products) {
     name: product.nameZh || product.name, summary: product.descriptionZh || product.description || '',
     description: richTextFromParagraphs(product.descriptionZh ? [product.descriptionZh] : []),
     specs: (product.specs ?? []).map((spec: any) => ({ label: spec.labelZh || spec.label, value: spec.valueZh || spec.value })),
-    options: (product.optionGroups ?? []).map((group: any) => ({
+    options: (product.optionGroups ?? []).map((group: any, groupIndex: number) => ({
       key: group.id, label: group.labelZh || group.label,
-      choices: (group.choices ?? []).map((choice: any) => ({ value: choice.value, label: choice.valueZh || choice.value, note: choice.noteZh || choice.note || '', customInquiry: Boolean(choice.custom) })),
+      choices: (group.choices ?? []).map((choice: any, choiceIndex: number) => ({ value: choice.value, label: choice.valueZh || choice.value,
+        note: choice.noteZh || choice.note || '', customInquiry: Boolean(choice.custom), image: optionGroups[groupIndex]?.choices[choiceIndex]?.image })),
     })),
+    heroTitle: product.heroTitleZh || product.heroTitle, heroIntro: product.heroIntroZh || product.heroIntro,
+    quoteLabel: product.quoteLabelZh || product.quoteLabel, dielineLabel: product.dielineLabelZh || product.dielineLabel,
+    detailTitle: product.detailTitleZh || product.detailTitle, detailParagraphs: (product.detailParagraphsZh ?? product.detailParagraphs ?? []).join('\n'),
+    galleryDetails: (product.galleryDetails ?? []).map((item: any, index: number) => ({ title: item.titleZh || item.title, description: item.descriptionZh || item.description, image: galleryDetails[index]?.image })),
+    badges: (product.badges ?? []).map((item: any) => ({ label: item.labelZh || item.label, tone: item.tone })),
+    assurance: (product.assurance ?? []).map((item: any) => ({ icon: item.icon, label: item.labelZh || item.label })),
+    highlights: (product.highlights ?? []).map((item: any) => ({ icon: item.icon, label: item.labelZh || item.label })),
+    customOptionsTitle: product.customOptionsTitleZh || product.customOptionsTitle, customOptionsIntro: product.customOptionsIntroZh || product.customOptionsIntro,
+    customOptions: (product.customOptions ?? []).map((item: any) => ({ name: item.nameZh || item.name, description: item.descriptionZh || item.description })),
+    featureCard: product.featureCard ? { title: product.featureCard.titleZh || product.featureCard.title, body: product.featureCard.bodyZh || product.featureCard.body, diagram: product.featureCard.diagram,
+      items: (product.featureCard.items ?? []).map((item: any) => ({ title: item.titleZh || item.title, body: item.bodyZh || item.body })) } : undefined,
+    compliance: product.compliance ? { title: product.compliance.titleZh || product.compliance.title, body: product.compliance.bodyZh || product.compliance.body,
+      capabilities: (product.compliance.capabilities ?? []).map((item: any) => ({ title: item.titleZh || item.title, body: item.bodyZh || item.body })) } : undefined,
+    closingCta: product.closingCta ? { title: product.closingCta.titleZh || product.closingCta.title, body: product.closingCta.bodyZh || product.closingCta.body,
+      quoteLabel: product.closingCta.quoteLabelZh || product.closingCta.quoteLabel, secondaryLabel: product.closingCta.secondaryLabelZh || product.closingCta.secondaryLabel, secondaryRequest: product.closingCta.secondaryRequest } : undefined,
     seo: { title: product.seoTitleZh || product.seoTitle, description: product.seoDescriptionZh || product.seoDescription, robots: indexable ? 'index' : 'noindex' },
   })
+  const dual = (en: any, zh: any) => ({ en, zh: zh || en })
+  await payload.update({ collection: 'products', id: doc.id, locale: 'all', overrideAccess: true, user: admin,
+    data: {
+      specs: (product.specs ?? []).map((item: any) => ({ label: dual(item.label, item.labelZh), value: dual(item.value, item.valueZh) })),
+      options: (product.optionGroups ?? []).map((group: any, groupIndex: number) => ({ key: group.id, label: dual(group.label, group.labelZh),
+        choices: (group.choices ?? []).map((choice: any, choiceIndex: number) => ({ value: choice.value, label: dual(choice.value, choice.valueZh),
+          note: dual(choice.note || '', choice.noteZh || choice.note || ''), customInquiry: Boolean(choice.custom), image: optionGroups[groupIndex]?.choices[choiceIndex]?.image })) })),
+      badges: (product.badges ?? []).map((item: any) => ({ label: dual(item.label, item.labelZh), tone: item.tone })),
+      galleryDetails: (product.galleryDetails ?? []).map((item: any, index: number) => ({ title: dual(item.title, item.titleZh), description: dual(item.description, item.descriptionZh), image: galleryDetails[index]?.image })),
+      assurance: (product.assurance ?? []).map((item: any) => ({ icon: item.icon, label: dual(item.label, item.labelZh) })),
+      highlights: (product.highlights ?? []).map((item: any) => ({ icon: item.icon, label: dual(item.label, item.labelZh) })),
+      customOptions: (product.customOptions ?? []).map((item: any) => ({ name: dual(item.name, item.nameZh), description: dual(item.description, item.descriptionZh) })),
+      featureCard: product.featureCard ? { title: dual(product.featureCard.title, product.featureCard.titleZh), body: dual(product.featureCard.body, product.featureCard.bodyZh), diagram: product.featureCard.diagram,
+        items: (product.featureCard.items ?? []).map((item: any) => ({ title: dual(item.title, item.titleZh), body: dual(item.body, item.bodyZh) })) } : undefined,
+      compliance: product.compliance ? { title: dual(product.compliance.title, product.compliance.titleZh), body: dual(product.compliance.body, product.compliance.bodyZh),
+        capabilities: (product.compliance.capabilities ?? []).map((item: any) => ({ title: dual(item.title, item.titleZh), body: dual(item.body, item.bodyZh) })) } : undefined,
+      closingCta: product.closingCta ? { title: dual(product.closingCta.title, product.closingCta.titleZh), body: dual(product.closingCta.body, product.closingCta.bodyZh),
+        quoteLabel: dual(product.closingCta.quoteLabel, product.closingCta.quoteLabelZh), secondaryLabel: dual(product.closingCta.secondaryLabel, product.closingCta.secondaryLabelZh), secondaryRequest: product.closingCta.secondaryRequest } : undefined,
+    } as any })
   productIds.set(product.slug, doc.id)
 }
 console.log(`Products ready: ${productIds.size}`)

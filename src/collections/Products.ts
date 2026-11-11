@@ -45,11 +45,71 @@ export const Products: CollectionConfig = {
                     { name: 'value', type: 'text', required: true },
                     { name: 'label', type: 'text', required: true, localized: true },
                     { name: 'note', type: 'text', localized: true },
+                    { name: 'image', type: 'upload', relationTo: 'media' },
                     { name: 'customInquiry', type: 'checkbox', defaultValue: false },
                   ],
                 },
               ],
             },
+          ],
+        },
+        {
+          label: 'PDP Content',
+          fields: [
+            { name: 'heroTitle', type: 'text', localized: true },
+            { name: 'heroIntro', type: 'textarea', localized: true },
+            { name: 'quoteLabel', type: 'text', localized: true },
+            { name: 'dielineLabel', type: 'text', localized: true },
+            { name: 'detailTitle', type: 'text', localized: true },
+            { name: 'detailParagraphs', type: 'textarea', localized: true, admin: { description: 'One paragraph per line.' } },
+            { name: 'badges', type: 'array', fields: [
+              { name: 'label', type: 'text', localized: true },
+              { name: 'tone', type: 'text' },
+            ] },
+            { name: 'galleryDetails', type: 'array', fields: [
+              { name: 'image', type: 'upload', relationTo: 'media' },
+              { name: 'title', type: 'text', localized: true },
+              { name: 'description', type: 'textarea', localized: true },
+            ] },
+            { name: 'assurance', type: 'array', fields: [
+              { name: 'icon', type: 'text', required: true },
+              { name: 'label', type: 'text', localized: true },
+            ] },
+            { name: 'highlights', type: 'array', fields: [
+              { name: 'icon', type: 'text', required: true },
+              { name: 'label', type: 'text', localized: true },
+            ] },
+            { name: 'customOptionsTitle', type: 'text', localized: true },
+            { name: 'customOptionsIntro', type: 'textarea', localized: true },
+            { name: 'customOptions', type: 'array', fields: [
+              { name: 'name', type: 'text', localized: true },
+              { name: 'description', type: 'textarea', localized: true },
+            ] },
+            { name: 'featureCard', type: 'group', fields: [
+              { name: 'title', type: 'text', localized: true },
+              { name: 'body', type: 'textarea', localized: true },
+              { name: 'diagram', type: 'text' },
+              { name: 'items', type: 'array', fields: [
+                { name: 'title', type: 'text', localized: true },
+                { name: 'body', type: 'textarea', localized: true },
+              ] },
+            ] },
+            { name: 'compliance', type: 'group', fields: [
+              { name: 'title', type: 'text', localized: true },
+              { name: 'body', type: 'textarea', localized: true },
+              { name: 'capabilities', type: 'array', fields: [
+                { name: 'title', type: 'text', localized: true },
+                { name: 'body', type: 'textarea', localized: true },
+              ] },
+            ] },
+            { name: 'closingCta', type: 'group', fields: [
+              { name: 'title', type: 'text', localized: true },
+              { name: 'body', type: 'textarea', localized: true },
+              { name: 'quoteLabel', type: 'text', localized: true },
+              { name: 'secondaryLabel', type: 'text', localized: true },
+              { name: 'secondaryRequest', type: 'text' },
+            ] },
+            { name: 'documents', type: 'relationship', relationTo: 'documents', hasMany: true },
           ],
         },
         {
