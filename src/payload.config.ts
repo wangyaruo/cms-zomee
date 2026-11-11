@@ -50,7 +50,7 @@ export default buildConfig({
       { label: 'ไทย', code: 'th' },
     ],
   },
-  db: sqliteAdapter({ client: { url: databaseUrl } }),
+  db: sqliteAdapter({ client: { url: databaseUrl }, push: process.env.PAYLOAD_DB_PUSH !== 'false' }),
   secret: process.env.PAYLOAD_SECRET || '',
   sharp,
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

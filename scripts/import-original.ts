@@ -85,6 +85,7 @@ for (const faq of source.faqs) {
   const publish = faq.status === 'published' && Boolean(faq.answer)
   const doc = await upsert('faqs', 'stableKey', faq.id, {
     stableKey: faq.id, question: faq.question, answer: english, sortOrder: faq.sortOrder || 0,
+    category: faq.category || 'products', displayLocations: faq.displayLocations || ['library'],
     reviewedAt: faq.lastReviewed || undefined, _status: publish ? 'published' : 'draft',
   }, { question: faq.questionZh || faq.question, answer: chinese })
   faqIds.set(faq.id, doc.id)
@@ -155,6 +156,15 @@ for (const post of source.posts) {
     title: post.titleZh, excerpt: post.excerptZh, body: richTextFromEditorial(post.editorial, 'zh'),
     tags: (post.tagsZh ?? []).map((tag: string) => ({ tag })),
     seo: { title: post.titleZh, description: post.excerptZh, robots: post.editorial.status === 'published' ? 'index' : 'noindex' },
+  })
+}
+
+for (const faq of source.faqs) {
+  const id = faqIds.get(faq.id)
+  if (!id) continue
+  await payload.update({
+    collection: 'faqs', id, overrideAccess: true, user: admin, draft: false,
+    data: { products: (faq.relatedProductSlugs ?? []).map((slug: string) => productIds.get(slug)).filter(Boolean) },
   })
 }
 
