@@ -12,6 +12,7 @@ import { Products } from './collections/Products'
 import { Posts } from './collections/Posts'
 import { Faqs } from './collections/Faqs'
 import { Releases } from './collections/Releases'
+import { Pages } from './collections/Pages'
 import { SiteSettings } from './globals/SiteSettings'
 import { snapshotEndpoint } from './endpoints/snapshot'
 import { createReleaseEndpoint } from './endpoints/releases'
@@ -28,9 +29,10 @@ export default buildConfig({
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: ' — ZOMEEX CMS', description: 'ZOMEEX website content management' },
+    components: { beforeDashboard: ['/components/CanvasLink'] },
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases],
+  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages],
   globals: [SiteSettings],
   endpoints: [snapshotEndpoint, createReleaseEndpoint],
   localization: {
