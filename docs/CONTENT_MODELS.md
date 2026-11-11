@@ -10,7 +10,8 @@
 | Navigation Menus | 2 | 菜单项、子项、中英文标签、链接、排序 |
 | Legal Pages | 2 | 标题、slug、修订日期、简介、SEO、完整法律章节 |
 | Site Pages | 7 | Home、About、Quality、Company、How We Work、Project Process、Contact；Sections 按稳定 sourcePath 编辑标题、正文、列表、媒体和链接 |
-| Documents | 8 | 中英文 Checklist PDF、语言、关联资源、发布状态 |
+| Documents | 8 + 上传 | 中英文 Checklist PDF；AI／EPS／PDF／ZIP 刀模、预览、尺寸、版本、用途和发布确认 |
+| Private Documents | 管理员上传 | 私有项目文件；仅管理员可读取，不进入公开快照 |
 
 Resources 当前包括 Artwork、Materials、Checklists、Compliance、Dielines、Packaging Finder。
 

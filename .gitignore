@@ -7,6 +7,7 @@ node_modules/
 data/
 media/*
 !media/.gitkeep
+private-documents/
 *.tsbuildinfo
 next-env.d.ts
 src/payload-types.ts
