@@ -150,7 +150,7 @@ for (const post of source.posts) {
     tags: (post.tags ?? []).map((tag: string) => ({ tag })),
     relatedProducts: (post.editorial.relatedProducts ?? []).map((item: any) => productIds.get(item.slug)).filter(Boolean),
     seo: { title: post.title, description: post.excerpt, robots: post.editorial.status === 'published' ? 'index' : 'noindex' },
-    sourceData: post, _status: post.editorial.status === 'published' ? 'published' : 'draft',
+    sourceData: post, _status: 'published',
   }, {
     title: post.titleZh, excerpt: post.excerptZh, body: richTextFromEditorial(post.editorial, 'zh'),
     tags: (post.tagsZh ?? []).map((tag: string) => ({ tag })),

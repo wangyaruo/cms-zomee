@@ -8,7 +8,4 @@ export const isEditor: Access = ({ req }) =>
 
 export const adminOnlyField: FieldAccess = ({ req }) => req.user?.role === 'admin'
 
-export const publishedOrEditor: Access = ({ req }) => {
-  if (req.user) return isEditor({ req })
-  return { _status: { equals: 'published' } }
-}
+export const publishedOrEditor: Access = isEditor

@@ -36,8 +36,12 @@ assert.equal(sampleZh.name, source.products.find((product: any) => product.slug 
 console.log('PASS product media, categories, source fields and Chinese content')
 
 const posts = await payload.find({ collection: 'posts', pagination: false, depth: 0, overrideAccess: true })
-assert.equal(posts.docs.filter((post) => post._status === 'published').length, source.posts.filter((post: any) => post.editorial.status === 'published').length)
-console.log('PASS blog publication boundaries')
+for (const post of posts.docs) {
+  const original = source.posts.find((item: any) => item.slug === post.slug)
+  const expected = original.editorial.status === 'published' ? 'index' : 'noindex'
+  assert.equal(post.seo?.robots, expected, `${post.slug} must preserve its original robots policy`)
+}
+console.log('PASS blog public visibility and robots boundaries')
 
 const media = await payload.find({ collection: 'media', pagination: false, depth: 0, overrideAccess: true })
 const sourcePaths = media.docs.map((item) => item.sourcePath).filter(Boolean)

@@ -45,7 +45,7 @@ npm run import:original -- --overwrite
 ## 发布边界
 
 - 产品保留原站可访问状态；demo、placeholder 和 pending 数据设置 `noindex`。
-- 博客初稿和预览继续保持草稿及 `noindex`，不会因导入自动发布。
+- 博客初稿和预览保持原站公开可见、`noindex` 的边界；公开状态与搜索收录分别控制。
 - 没有答案或仍为草稿的 FAQ 不会发布。
 - 历史无包装分类的硬件记录保留为空分类。
 - 原站刻意保留的重复 SKU 不会被强行合并或重编。
