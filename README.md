@@ -15,7 +15,7 @@
 - 仅导出已发布内容的服务端快照 API
 - SQLite 本地持久化；数据库与上传文件不提交 Git
 
-详细完成范围见 [`docs/IMPLEMENTATION_CHECKLIST.md`](docs/IMPLEMENTATION_CHECKLIST.md)。原站导出、幂等导入和发布边界见 [`docs/CONTENT_MIGRATION.md`](docs/CONTENT_MIGRATION.md)。
+详细完成范围见 [`docs/IMPLEMENTATION_CHECKLIST.md`](docs/IMPLEMENTATION_CHECKLIST.md)。原站导出、幂等导入和发布边界见 [`docs/CONTENT_MIGRATION.md`](docs/CONTENT_MIGRATION.md)。不可变发布版本见 [`docs/RELEASES.md`](docs/RELEASES.md)。
 
 ## 环境要求
 

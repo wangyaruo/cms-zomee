@@ -13,6 +13,7 @@
     "seed": "node --env-file=.env --import tsx scripts/seed.ts",
     "test": "tsx --test tests/*.test.ts",
     "test:smoke": "node --env-file=.env --import tsx scripts/smoke.ts",
+    "test:releases": "node --env-file=.env --import tsx scripts/releases-smoke.ts",
     "import:original": "node --env-file=.env --import tsx scripts/import-original.ts",
     "verify:import": "node --env-file=.env --import tsx scripts/verify-import.ts",
     "typecheck": "tsc --noEmit"

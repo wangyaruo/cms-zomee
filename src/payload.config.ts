@@ -11,8 +11,10 @@ import { Categories } from './collections/Categories'
 import { Products } from './collections/Products'
 import { Posts } from './collections/Posts'
 import { Faqs } from './collections/Faqs'
+import { Releases } from './collections/Releases'
 import { SiteSettings } from './globals/SiteSettings'
 import { snapshotEndpoint } from './endpoints/snapshot'
+import { createReleaseEndpoint } from './endpoints/releases'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -28,9 +30,9 @@ export default buildConfig({
     meta: { titleSuffix: ' — ZOMEEX CMS', description: 'ZOMEEX website content management' },
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Products, Posts, Faqs],
+  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases],
   globals: [SiteSettings],
-  endpoints: [snapshotEndpoint],
+  endpoints: [snapshotEndpoint, createReleaseEndpoint],
   localization: {
     defaultLocale: 'en',
     fallback: true,
