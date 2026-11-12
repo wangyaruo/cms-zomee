@@ -26,7 +26,7 @@ npm run cms:export -- /绝对路径/cms-zomee/import/original-content.json
 
 ```dotenv
 ORIGINAL_CONTENT_FILE=import/original-content.json
-ORIGINAL_PUBLIC_DIR=../public
+ORIGINAL_PUBLIC_DIR=../zomme-index/public
 ```
 
 执行：

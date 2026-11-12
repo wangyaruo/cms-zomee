@@ -36,7 +36,7 @@ async function main() {
   assert.equal(unauthorized.status, 401)
   console.log('PASS snapshot rejects anonymous requests')
 
-  const image = await readFile(new URL('../../public/favicon.png', import.meta.url))
+  const image = await readFile(new URL('../../zomme-index/public/favicon.png', import.meta.url))
   const form = new FormData()
   form.append('file', new Blob([image], { type: 'image/png' }), 'cms-smoke.png')
   form.append('_payload', JSON.stringify({ alt: 'CMS smoke test image' }))

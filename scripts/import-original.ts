@@ -6,7 +6,7 @@ import config from '../src/payload.config'
 import { richTextFromEditorial, richTextFromFaqBlocks, richTextFromParagraphs } from '../src/lib/lexical'
 
 const sourceFile = path.resolve(process.env.ORIGINAL_CONTENT_FILE || 'import/original-content.json')
-const publicDir = path.resolve(process.env.ORIGINAL_PUBLIC_DIR || '../public')
+const publicDir = path.resolve(process.env.ORIGINAL_PUBLIC_DIR || '../zomme-index/public')
 const overwrite = process.argv.includes('--overwrite')
 const source = JSON.parse(await readFile(sourceFile, 'utf8'))
 const payload = await getPayload({ config })
