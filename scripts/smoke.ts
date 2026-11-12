@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
+import { contentTrashCollections } from '../src/collections/contentTrash'
 
 const base = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3100'
 const email = process.env.CMS_BOOTSTRAP_EMAIL
@@ -97,9 +98,15 @@ async function main() {
 main().finally(async () => {
   const admin = email && password ? await login(email!, password!) : ''
   for (const item of created.reverse()) {
-    if (admin) await api(`/${item.collection}/${item.id}`, { method: 'DELETE' }, admin)
+    if (!admin) continue
+    const options: RequestInit = contentTrashCollections.has(item.collection) ? {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deletedAt: new Date().toISOString() }),
+    } : { method: 'DELETE' }
+    const { response } = await api(`/${item.collection}/${item.id}`, options, admin)
+    assert(response.ok, `Could not clean up ${item.collection} test record (${response.status}).`)
   }
-  console.log('Smoke test records cleaned up.')
+  console.log('Smoke test content moved to trash; temporary account and media removed.')
 }).catch((error) => {
   console.error(error)
   process.exit(1)

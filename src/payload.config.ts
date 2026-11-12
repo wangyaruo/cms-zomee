@@ -22,6 +22,7 @@ import { LegalPages } from './collections/LegalPages'
 import { SitePages } from './collections/SitePages'
 import { Documents } from './collections/Documents'
 import { PrivateDocuments } from './collections/PrivateDocuments'
+import { contentTrashCollections, withContentTrash } from './collections/contentTrash'
 import { SiteSettings } from './globals/SiteSettings'
 import { snapshotEndpoint } from './endpoints/snapshot'
 import { createReleaseEndpoint } from './endpoints/releases'
@@ -46,7 +47,8 @@ export default buildConfig({
   },
   i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents, PrivateDocuments].map(localizeCollection),
+  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents, PrivateDocuments]
+    .map((collection) => localizeCollection(contentTrashCollections.has(collection.slug) ? withContentTrash(collection) : collection)),
   globals: [SiteSettings].map(localizeGlobal),
   endpoints: [snapshotEndpoint, createReleaseEndpoint],
   localization: {

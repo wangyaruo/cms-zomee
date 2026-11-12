@@ -19,8 +19,9 @@ export const guardPublishing: CollectionBeforeChangeHook = ({ data, req }) => {
   return data
 }
 
-export const requirePublishedFaqAnswer: CollectionBeforeChangeHook = ({ data, req }) => {
-  if (data._status === 'published' && !data.answer?.root?.children?.length) {
+export const requirePublishedFaqAnswer: CollectionBeforeChangeHook = ({ data, originalDoc, req }) => {
+  const answer = data.answer === undefined ? originalDoc?.answer : data.answer
+  if (data._status === 'published' && !answer?.root?.children?.length) {
     throw new Error(copy(req.i18n.language, 'Add an answer before publishing this FAQ.', '请填写回答后再发布此常见问题。'))
   }
   return data
