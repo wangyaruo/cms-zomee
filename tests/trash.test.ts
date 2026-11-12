@@ -140,7 +140,7 @@ test('the content recycle bin preserves records and controls their visibility', 
   }
 
   // Payload's admin restore submits a bulk update scoped to deleted records.
-  const restoreWhere = (id: number): Where => ({ and: [{ id: { equals: id } }, { deletedAt: { exists: true } }] })
+  const restoreWhere = (id: number | string): Where => ({ and: [{ id: { equals: id } }, { deletedAt: { exists: true } }] })
   const restored = await cms.update({ ...review, collection: 'categories', where: restoreWhere(category.id),
     trash: true, draft: true, data: { deletedAt: null },
   })

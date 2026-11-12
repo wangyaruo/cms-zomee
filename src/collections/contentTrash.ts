@@ -67,6 +67,20 @@ export function withContentTrash(config: CollectionConfig): CollectionConfig {
   return {
     ...config,
     trash: true,
+    admin: {
+      ...config.admin,
+      components: {
+        ...config.admin?.components,
+        beforeListTable: [
+          ...(config.admin?.components?.beforeListTable ?? []),
+          '/components/TrashImpact#ListTrashImpact',
+        ],
+      },
+    },
+    fields: [
+      { name: 'trashImpact', type: 'ui', admin: { components: { Field: '/components/TrashImpact#DocumentTrashImpact' } } },
+      ...config.fields,
+    ],
     access: {
       ...config.access,
       // Payload checks delete access for both actions. Only a move to trash supplies deletedAt.
