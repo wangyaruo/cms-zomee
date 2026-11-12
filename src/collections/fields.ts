@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import type { Field, GroupField, PayloadRequest } from 'payload'
 import { isValidSlug } from '../lib/validation'
 import { validationCopy } from '../i18n/shared'
@@ -8,6 +9,9 @@ export const slugField: Field = {
   required: true,
   unique: true,
   index: true,
+  hooks: {
+    beforeDuplicate: [({ value }) => `${isValidSlug(value) ? value : 'content'}-copy-${randomBytes(10).toString('hex')}`],
+  },
   admin: { description: 'Stable URL identifier. Use lowercase letters, numbers and hyphens.' },
   validate: (value: unknown, { req }: { req: PayloadRequest }) => isValidSlug(value) || validationCopy(req.i18n.language).slug,
 }

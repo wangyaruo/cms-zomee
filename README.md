@@ -18,6 +18,12 @@
 
 详细完成范围见 [`docs/IMPLEMENTATION_CHECKLIST.md`](docs/IMPLEMENTATION_CHECKLIST.md)。原站导出、幂等导入和发布边界见 [`docs/CONTENT_MIGRATION.md`](docs/CONTENT_MIGRATION.md)。不可变发布版本见 [`docs/RELEASES.md`](docs/RELEASES.md)。拖拽式可视化页面画布见 [`docs/CANVAS.md`](docs/CANVAS.md)。扩展内容模型见 [`docs/CONTENT_MODELS.md`](docs/CONTENT_MODELS.md)。
 
+## 复制已有内容
+
+打开产品、分类、博客文章、应用场景或解决方案的编辑页，在右上角「⋯」菜单选择「复制」。后台从最近一次保存的内容创建独立草稿，保留各语言文案、数组、图片和关联，并自动生成新网址标识。可以在副本中修改网址标识，再由审核员或管理员发布。
+
+产品副本清空 SKU，并标为「资料待完善」。博客副本清空发布日期和修订日期，取消推荐。隐藏的迁移数据不会带到副本，避免继承原页面的身份或专属模板。
+
 ## 环境要求
 
 - Node.js `^22.23.4` 或 `>=24.22.1`

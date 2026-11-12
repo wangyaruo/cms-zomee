@@ -1,6 +1,13 @@
-import type { CollectionBeforeChangeHook } from 'payload'
+import type { CollectionBeforeChangeHook, CollectionBeforeOperationHook } from 'payload'
 import { canPublish } from '../lib/validation'
 import { copy } from '../i18n/shared'
+
+/** Duplicating starts an independent draft, even if the API caller requests publication. */
+export const duplicateAsDraft: CollectionBeforeOperationHook = ({ args, operation }) => {
+  if (operation === 'create' && args.duplicateFromID != null) {
+    return { ...args, draft: true, data: { _status: 'draft' } }
+  }
+}
 
 /** Editors can prepare drafts, but only reviewers and administrators can publish. */
 export const guardPublishing: CollectionBeforeChangeHook = ({ data, req }) => {

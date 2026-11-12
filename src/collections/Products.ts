@@ -1,14 +1,15 @@
 import type { CollectionConfig } from 'payload'
 import { isEditor, publishedOrEditor } from '../access/roles'
 import { seoFields, slugField, sortOrderField } from './fields'
-import { guardPublishing } from './hooks'
+import { duplicateAsDraft, guardPublishing } from './hooks'
 
 export const Products: CollectionConfig = {
   slug: 'products',
+  disableDuplicate: false,
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'sku', 'slug', '_status', 'updatedAt'], group: 'Content' },
   access: { read: publishedOrEditor, create: isEditor, update: isEditor, delete: isEditor },
   versions: { drafts: { autosave: { interval: 800 } }, maxPerDoc: 50 },
-  hooks: { beforeChange: [guardPublishing] },
+  hooks: { beforeOperation: [duplicateAsDraft], beforeChange: [guardPublishing] },
   fields: [
     {
       type: 'tabs',
@@ -18,7 +19,7 @@ export const Products: CollectionConfig = {
           fields: [
             { name: 'name', type: 'text', required: true, localized: true },
             slugField,
-            { name: 'sku', type: 'text', index: true, admin: { description: 'Source SKUs are indexed but not forced unique; legacy duplicates are preserved.' } },
+            { name: 'sku', type: 'text', index: true, hooks: { beforeDuplicate: [() => null] }, admin: { description: 'Source SKUs are indexed but not forced unique; legacy duplicates are preserved.' } },
             { name: 'summary', type: 'textarea', localized: true },
             { name: 'description', type: 'richText', localized: true },
             { name: 'image', type: 'upload', relationTo: 'media', required: true },
@@ -117,13 +118,13 @@ export const Products: CollectionConfig = {
           fields: [
             { name: 'relatedProducts', type: 'relationship', relationTo: 'products', hasMany: true },
             { name: 'faqs', type: 'relationship', relationTo: 'faqs', hasMany: true },
-            { name: 'sourceData', type: 'json', admin: { hidden: true, description: 'Unmapped original PDP fields retained for the frontend adapter.' } },
+            { name: 'sourceData', type: 'json', hooks: { beforeDuplicate: [() => null] }, admin: { hidden: true, description: 'Unmapped original PDP fields retained for the frontend adapter.' } },
           ],
         },
         { label: 'SEO', fields: [seoFields] },
       ],
     },
-    { name: 'contentStatus', type: 'select', required: true, defaultValue: 'incomplete', options: [
+    { name: 'contentStatus', type: 'select', required: true, defaultValue: 'incomplete', hooks: { beforeDuplicate: [() => 'incomplete'] }, options: [
       { label: 'Incomplete source data', value: 'incomplete' },
       { label: 'Ready for review', value: 'ready' },
       { label: 'Legacy demo', value: 'demo' },
