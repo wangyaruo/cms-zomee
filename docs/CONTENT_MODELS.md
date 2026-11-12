@@ -19,7 +19,7 @@ Resources 当前包括 Artwork、Materials、Checklists、Compliance、Dielines�
 
 Applications、Solutions、Resources、Legal Pages 的 `sourceData` 保留原站完整数据，包括段落、列表、推荐理由、表单定义、法律条款等。后台提供常用字段编辑，快照保留完整结构供原站渲染。
 
-Applications 新建记录的隐藏 `sourceData` 默认值为 `{}`，编辑者只需填写可见字段即可保存，不需要先提供迁移用的原始结构。已有迁移数据继续保留，Solutions 和 Resources 的要求不变。这是创建时的字段默认值调整，不新增或修改数据库列。
+Applications 和 Solutions 新建记录的隐藏 `sourceData` 默认值为 `{}`，编辑者只需填写可见字段即可保存，不需要先提供迁移用的原始结构。已有迁移数据继续保留，Resources 的要求不变。这是创建时的字段默认值调整，不新增或修改数据库列。
 
 产品和文章快照继续移除 `sourceData`，因为原站已有这些记录作为回退，避免重复传输。其他结构化页面保留该字段。
 

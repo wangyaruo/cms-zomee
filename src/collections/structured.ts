@@ -31,7 +31,7 @@ export const Solutions: CollectionConfig = {
   slug: 'solutions', admin: { useAsTitle: 'title', defaultColumns: ['title', 'slug', '_status'], group: 'Content' },
   versions: { drafts: true, maxPerDoc: 30 }, access: { read: publishedOrEditor, create: isEditor, update: isEditor, delete: isReviewer },
   hooks: { beforeChange: [guardPublishing] },
-  fields: [...baseFields('solution'),
+  fields: [...baseFields('solution', {}),
     { name: 'products', type: 'relationship', relationTo: 'products', hasMany: true },
     { name: 'applications', type: 'relationship', relationTo: 'applications', hasMany: true },
   ],
