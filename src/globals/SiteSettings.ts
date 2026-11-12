@@ -1,5 +1,6 @@
-import type { GlobalConfig } from 'payload'
+import type { GlobalConfig, PayloadRequest } from 'payload'
 import { isEditor, isReviewer } from '../access/roles'
+import { validationCopy } from '../i18n/shared'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -25,7 +26,7 @@ export const SiteSettings: GlobalConfig = {
       name: 'socialLinks', type: 'array', maxRows: 10,
       fields: [
         { name: 'label', type: 'text', required: true },
-        { name: 'url', type: 'text', required: true, validate: (value: unknown) => typeof value === 'string' && /^https:\/\//.test(value) ? true : 'Use an https URL.' },
+        { name: 'url', type: 'text', required: true, validate: (value: unknown, { req }: { req: PayloadRequest }) => typeof value === 'string' && /^https:\/\//.test(value) ? true : validationCopy(req.i18n.language).https },
       ],
     },
   ],

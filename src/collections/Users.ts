@@ -4,7 +4,10 @@ import { isAdmin } from '../access/roles'
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
-    cookies: { secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' },
+    cookies: {
+      secure: process.env.NODE_ENV === 'production' && process.env.CMS_COOKIE_SECURE !== 'false',
+      sameSite: 'Lax',
+    },
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
     tokenExpiration: 8 * 60 * 60,

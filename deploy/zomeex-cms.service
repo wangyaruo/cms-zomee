@@ -1,0 +1,26 @@
+[Unit]
+Description=ZOMEEX CMS
+After=network.target
+
+[Service]
+Type=simple
+User=zomeex-cms
+Group=zomeex-cms
+WorkingDirectory=/opt/zomeex-cms/current
+EnvironmentFile=/opt/zomeex-cms/shared/.env
+Environment=NODE_ENV=production
+Environment=NEXT_TELEMETRY_DISABLED=1
+Environment=PATH=/opt/node/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/opt/node/bin/node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 18201
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/zomeex-cms
+
+[Install]
+WantedBy=multi-user.target

@@ -1,5 +1,6 @@
-import type { Field, GroupField } from 'payload'
+import type { Field, GroupField, PayloadRequest } from 'payload'
 import { isValidSlug } from '../lib/validation'
+import { validationCopy } from '../i18n/shared'
 
 export const slugField: Field = {
   name: 'slug',
@@ -8,7 +9,7 @@ export const slugField: Field = {
   unique: true,
   index: true,
   admin: { description: 'Stable URL identifier. Use lowercase letters, numbers and hyphens.' },
-  validate: (value: unknown) => isValidSlug(value) || 'Use lowercase letters, numbers and hyphens only.',
+  validate: (value: unknown, { req }: { req: PayloadRequest }) => isValidSlug(value) || validationCopy(req.i18n.language).slug,
 }
 
 export const seoFields: GroupField = {

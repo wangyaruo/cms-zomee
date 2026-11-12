@@ -1,7 +1,8 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 import { isEditor, isReviewer, publishedOrEditor } from '../access/roles'
 import { guardPublishing } from './hooks'
 import { isValidSlug } from '../lib/validation'
+import { validationCopy } from '../i18n/shared'
 
 export const SitePages: CollectionConfig = {
   slug: 'site-pages', admin: { useAsTitle: 'title', defaultColumns: ['title', 'pageType', 'path', '_status'], group: 'Content' },
@@ -9,7 +10,7 @@ export const SitePages: CollectionConfig = {
   hooks: { beforeChange: [guardPublishing] },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true },
-    { name: 'slug', type: 'text', required: true, unique: true, validate: (value: unknown) => isValidSlug(value) || 'Use lowercase letters, numbers and hyphens.' },
+    { name: 'slug', type: 'text', required: true, unique: true, validate: (value: unknown, { req }: { req: PayloadRequest }) => isValidSlug(value) || validationCopy(req.i18n.language).slug },
     { name: 'path', type: 'text', required: true, unique: true },
     { name: 'pageType', type: 'select', required: true, options: ['home', 'about', 'contact', 'company', 'process', 'quality'] },
     { name: 'summary', type: 'textarea', localized: true },

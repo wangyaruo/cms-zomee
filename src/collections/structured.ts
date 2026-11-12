@@ -1,11 +1,12 @@
-import type { CollectionConfig, Field } from 'payload'
+import type { CollectionConfig, Field, PayloadRequest } from 'payload'
 import { isEditor, isReviewer, publishedOrEditor } from '../access/roles'
 import { guardPublishing } from './hooks'
 import { isValidSlug } from '../lib/validation'
+import { validationCopy } from '../i18n/shared'
 
 const baseFields = (collection: string): Field[] => [
   { name: 'title', type: 'text', required: true, localized: true },
-  { name: 'slug', type: 'text', required: true, unique: true, validate: (value: unknown) => isValidSlug(value) || 'Use lowercase letters, numbers and hyphens.' },
+  { name: 'slug', type: 'text', required: true, unique: true, validate: (value: unknown, { req }: { req: PayloadRequest }) => isValidSlug(value) || validationCopy(req.i18n.language).slug },
   { name: 'summary', type: 'textarea', localized: true },
   { name: 'heroImage', type: 'upload', relationTo: 'media' },
   { name: 'sourceData', type: 'json', required: true, admin: { hidden: true, description: `Complete original ${collection} structure retained for lossless frontend rendering.` } },

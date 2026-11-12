@@ -1,5 +1,6 @@
-import type { Config } from '@measured/puck'
+import type { Config, Field } from '@measured/puck'
 import type { CSSProperties, ReactNode } from 'react'
+import type { InterfaceLanguage } from '../i18n/shared'
 
 const text = (label: string) => ({ type: 'text' as const, label })
 const textarea = (label: string) => ({ type: 'textarea' as const, label })
@@ -24,7 +25,7 @@ export const canvasConfig: Config<CanvasProps> = {
     Hero: {
       label: 'Hero',
       defaultProps: { title: 'Packaging built around your product', body: 'Coordinate structure, materials, artwork and production in one project.', image: '', label: 'Discuss your project', href: '/contact', align: 'left' },
-      fields: { title: text('Title'), body: textarea('Body'), image: text('Image URL'), label: text('Button label'), href: link(), align: { type: 'select', options: [{ label: 'Left', value: 'left' }, { label: 'Center', value: 'center' }] } },
+      fields: { title: text('Title'), body: textarea('Body'), image: text('Image URL'), label: text('Button label'), href: link(), align: { type: 'select', label: 'Alignment', options: [{ label: 'Left', value: 'left' }, { label: 'Center', value: 'center' }] } },
       render: ({ title, body, image, label, href, align }) => <section className={`canvas-hero canvas-align-${align}`}><div><p className="canvas-eyebrow">ZOMEEX PACKAGING</p><h1>{title}</h1><p>{body}</p>{button(label, href)}</div>{image && <img src={image} alt="" />}</section>,
     },
     RichText: {
@@ -62,6 +63,39 @@ export const canvasConfig: Config<CanvasProps> = {
       render: ({ height }) => <div style={{ height } as CSSProperties} aria-hidden="true" />,
     },
   },
+}
+
+const editorLabels: Record<string, string> = {
+  Hero: '首屏区块', 'Rich text': '文本区块', 'Product cards': '产品卡片', 'Feature grid': '特色网格',
+  Media: '图片区块', FAQ: '常见问题', 'Call to action': '行动引导', Spacer: '留白',
+  Title: '标题', Body: '正文', 'Image URL': '图片地址', 'Button label': '按钮文字', 'Link URL': '链接地址',
+  Alignment: '对齐方式', Left: '左对齐', Center: '居中', Items: '条目', 'Product name': '产品名称',
+  'Product URL': '产品链接', 'Feature title': '特色标题', 'Feature body': '特色说明',
+  'Alternative text': '图片替代文字', Caption: '图片说明', Question: '问题', Answer: '回答',
+  'Height (px)': '高度（像素）', Product: '产品', Feature: '特色',
+}
+
+/** Translate editor metadata without rewriting saved page copy. */
+export function getCanvasConfig(language: InterfaceLanguage): Config<CanvasProps> {
+  if (language === 'en') return canvasConfig
+  const translate = (value: string) => editorLabels[value] || value
+  const localize = (field: Field, name: string): Field => {
+    const result = { ...field, label: translate(field.label || (name === 'items' ? 'Items' : name)) }
+    if (result.type === 'array') {
+      const summary = result.getItemSummary
+      result.arrayFields = Object.fromEntries(Object.entries(result.arrayFields).map(([key, value]) => [key, localize(value, key)]))
+      if (summary) result.getItemSummary = (item, index) => translate(summary(item, index))
+    }
+    if (result.type === 'select' || result.type === 'radio') result.options = result.options.map((option) => ({ ...option, label: translate(option.label) }))
+    return result
+  }
+  return {
+    ...canvasConfig,
+    components: Object.fromEntries(Object.entries(canvasConfig.components).map(([key, component]) => [key, {
+      ...component, label: translate(component.label || key),
+      fields: Object.fromEntries(Object.entries(component.fields || {}).map(([name, field]) => [name, localize(field, name)])),
+    }])) as Config<CanvasProps>['components'],
+  }
 }
 
 export function CanvasShell({ children }: { children: ReactNode }) {

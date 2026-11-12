@@ -5,6 +5,9 @@ import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import sharp from 'sharp'
+import { en } from '@payloadcms/translations/languages/en'
+import { zh } from '@payloadcms/translations/languages/zh'
+import { localizeCollection, localizeGlobal } from './i18n/admin'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
@@ -35,11 +38,16 @@ export default buildConfig({
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: ' — ZOMEEX CMS', description: 'ZOMEEX website content management' },
-    components: { beforeDashboard: ['/components/CanvasLink'] },
+    components: {
+      beforeLogin: ['/components/AdminLanguageSwitcher'],
+      beforeNavLinks: ['/components/AdminLanguageSwitcher'],
+      beforeDashboard: ['/components/CanvasLink'],
+    },
   },
+  i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents, PrivateDocuments],
-  globals: [SiteSettings],
+  collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents, PrivateDocuments].map(localizeCollection),
+  globals: [SiteSettings].map(localizeGlobal),
   endpoints: [snapshotEndpoint, createReleaseEndpoint],
   localization: {
     defaultLocale: 'en',
