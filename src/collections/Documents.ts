@@ -3,10 +3,11 @@ import { isEditor, isReviewer, publishedOrEditor } from '../access/roles'
 import { guardPublishing } from './hooks'
 import { enforceUploadLimits } from './uploadLimits'
 import { label } from '../i18n/shared'
+import { uploadedFileHeaders } from './svgUploads'
 
 export const Documents: CollectionConfig = {
-  slug: 'documents', admin: { useAsTitle: 'title', defaultColumns: ['title', 'sourcePath', '_status'], group: 'Content', description: label('Files up to 50 MiB.', '单个文件最大 50 MiB。') },
-  upload: { staticDir: 'documents', pasteURL: false, mimeTypes: ['application/pdf', 'application/postscript', 'application/illustrator', 'application/zip', 'application/x-zip-compressed', 'text/plain'] },
+  slug: 'documents', admin: { useAsTitle: 'title', defaultColumns: ['title', 'sourcePath', '_status'], group: 'Content', description: label('Files up to 50 MiB. SVG uploads are disabled.', '单个文件最大 50 MiB，不支持上传 SVG。') },
+  upload: { staticDir: 'documents', pasteURL: false, modifyResponseHeaders: uploadedFileHeaders, mimeTypes: ['application/pdf', 'application/postscript', 'application/illustrator', 'application/zip', 'application/x-zip-compressed', 'text/plain'] },
   versions: { drafts: true, maxPerDoc: 20 }, access: { read: publishedOrEditor, create: isEditor, update: isEditor, delete: isReviewer },
   hooks: { beforeOperation: [enforceUploadLimits], beforeChange: [guardPublishing] },
   fields: [

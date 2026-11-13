@@ -3,6 +3,7 @@ import path from 'node:path'
 import { APIError, type CollectionBeforeOperationHook, type Config, type PayloadRequest } from 'payload'
 import sharp from 'sharp'
 import { copy } from '../i18n/shared'
+import { declaresSvg, hasSvgRoot } from './svgUploads'
 
 export const MEDIA_MAX_BYTES = 10 * 1024 * 1024
 export const DOCUMENT_MAX_BYTES = 50 * 1024 * 1024
@@ -16,6 +17,11 @@ const positiveInteger = (value: unknown): value is number =>
 
 function uploadError(req: PayloadRequest, en: string, zh: string, status = 400): never {
   throw new APIError(copy(req.i18n.language, en, zh), status)
+}
+
+function rejectSvg(req: PayloadRequest): never {
+  uploadError(req, 'SVG uploads are disabled. Export the image as PNG, JPEG, WebP, or AVIF before uploading.',
+    '不支持上传 SVG 文件，请先将图片导出为 PNG、JPEG、WebP 或 AVIF 再上传。')
 }
 
 function checkBytes(req: PayloadRequest, bytes: number, media: boolean) {
@@ -38,6 +44,7 @@ async function checkImage(req: PayloadRequest, source: Buffer | string) {
     uploadError(req, 'The image could not be read. Upload a valid image file.', '无法读取图片，请上传有效的图片文件。')
   }
   const { width, height, pageHeight, pages } = metadata
+  if (metadata.format === 'svg') rejectSvg(req)
   if (!positiveInteger(width) || !positiveInteger(height)
     || (pageHeight !== undefined && !positiveInteger(pageHeight))
     || (pages !== undefined && !positiveInteger(pages))) {
@@ -53,7 +60,7 @@ async function checkImage(req: PayloadRequest, source: Buffer | string) {
   }
 }
 
-async function validateSource(req: PayloadRequest, source: Buffer | string, media: boolean) {
+async function validateSource(req: PayloadRequest, source: Buffer | string, media: boolean, name: string, mimeType?: string) {
   let bytes: number
   try {
     if (typeof source === 'string') {
@@ -67,6 +74,14 @@ async function validateSource(req: PayloadRequest, source: Buffer | string, medi
     uploadError(req, 'The uploaded file could not be read. Choose the file again.', '无法读取上传文件，请重新选择文件。')
   }
   checkBytes(req, bytes, media)
+  if (declaresSvg(name, mimeType)) rejectSvg(req)
+  let svg: boolean
+  try {
+    svg = await hasSvgRoot(source)
+  } catch {
+    uploadError(req, 'The file content could not be checked for SVG. Choose another file.', '无法完成文件内容的 SVG 检查，请更换文件。')
+  }
+  if (svg) rejectSvg(req)
   if (media) await checkImage(req, source)
   return bytes
 }
@@ -111,7 +126,7 @@ async function validateStoredFile(req: PayloadRequest, directory: string, doc: R
   if (relative.startsWith(`..${path.sep}`) || relative === '..' || path.isAbsolute(relative)) {
     uploadError(req, 'The stored file path is invalid.', '原文件路径无效。')
   }
-  await validateSource(req, source, media)
+  await validateSource(req, source, media, doc.filename, typeof doc.mimeType === 'string' ? doc.mimeType : undefined)
 }
 
 export const enforceUploadLimits: CollectionBeforeOperationHook = async ({ args, operation, req }) => {
@@ -130,7 +145,7 @@ export const enforceUploadLimits: CollectionBeforeOperationHook = async ({ args,
     if (!file.tempFilePath && !Buffer.isBuffer(file.data)) {
       uploadError(req, 'The uploaded file could not be read. Choose the file again.', '无法读取上传文件，请重新选择文件。')
     }
-    file.size = await validateSource(req, file.tempFilePath || file.data, media)
+    file.size = await validateSource(req, file.tempFilePath || file.data, media, file.name, file.mimetype)
     return
   }
   if (operation === 'create' && typeof data.url === 'string' && data.url) {
@@ -147,7 +162,7 @@ export const enforceUploadLimits: CollectionBeforeOperationHook = async ({ args,
   const readOptions = {
     collection: config.slug, depth: 0, draft: true, req,
     overrideAccess: args.overrideAccess ?? false,
-    select: { filename: true, ...(media ? { focalX: true as const, focalY: true as const } : {}) } as const,
+    select: { filename: true, mimeType: true, ...(media ? { focalX: true as const, focalY: true as const } : {}) } as const,
   }
   const validateUpdate = async (source: unknown) => {
     const doc = source as Record<string, unknown>
