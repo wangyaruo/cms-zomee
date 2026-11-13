@@ -23,6 +23,7 @@ Fetch Metadata 的情况。写请求保留原始 Origin，继续使用 Payload �
 
 服务器使用 `PAYLOAD_DB_PUSH=false`，保留已迁移数据库结构。升级内容模型时先备份，
 使用正式数据库迁移，不在生产环境自动推送结构变更。
+在仍使用旧用户表结构的环境中，上线用户名登录前运行 `node scripts/migrate-usernames.mjs /opt/zomeex-cms/shared/data/zomeex-cms.db`，添加可选的用户名字段。原有账号仍支持邮箱登录。
 
 ```bash
 systemctl status zomeex-cms
@@ -45,3 +46,7 @@ nginx -t
 发布包可能已包含 `media` 占位目录及 `documents` 示例文件。建立持久化链接前先保留并移开这些 release 内目录，确认 `media`、`documents`、`private-documents` 自身是指向对应 `shared` 路径的符号链接，避免把链接误建到目录内部。切换前应同时检查登录页、授权快照以及已有图片与 PDF；不能只依赖 HTML 登录页健康检查。
 
 当前 `Media` 与 `Documents` 仍沿用后台登录读取权限，匿名文件请求会被拒绝。以后部署公开官网时需要单独确认并实现公开媒体／已发布文件的访问规则；本次仅更新 CMS，未改变文件权限。
+
+## 2026-11-13 用户名登录
+
+线上切换到 `/opt/zomeex-cms/releases/20261113-6410856-username`，基于已部署的 `6410856` 启用用户名登录。原管理员账号保留邮箱与角色。上线前已备份 SQLite 数据库，并通过 `quick_check` 验证备份。切换后验证了 `8201` 的登录页、用户名和邮箱登录以及后台会话。

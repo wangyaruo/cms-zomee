@@ -4,6 +4,7 @@ import { isAdmin } from '../access/roles'
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
+    loginWithUsername: { allowEmailLogin: true, requireEmail: true, requireUsername: false },
     cookies: {
       secure: process.env.NODE_ENV === 'production' && process.env.CMS_COOKIE_SECURE !== 'false',
       sameSite: 'Lax',
