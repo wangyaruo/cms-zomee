@@ -187,10 +187,7 @@ export const uploadRequestLimits: Config['upload'] = {
   // Busboy emits its limit event when bytes equal the limit, so allow the boundary byte here.
   limits: { fileSize: DOCUMENT_MAX_BYTES + 1 },
   requestSizeLimit: DOCUMENT_MAX_BYTES + 2 * 1024 * 1024,
-  limitHandler: ({ request }) => {
-    const language = request.headers.get('accept-language')?.trim().toLowerCase() || 'zh'
-    throw new APIError(copy(language,
-      'Files must be 50 MiB or smaller. Images must be 10 MiB or smaller.',
-      '文件不能超过 50 MiB，媒体图片不能超过 10 MiB。'), 413)
-  },
+  // Payload includes global upload options in the admin client config. Keep this serializable;
+  // a limitHandler function prevents authenticated admin pages from rendering.
+  responseOnLimit: '文件不能超过 50 MiB，媒体图片不能超过 10 MiB。 / Files must be 50 MiB or smaller. Images must be 10 MiB or smaller.',
 }

@@ -4,6 +4,7 @@ import { isEditor, publishedOrEditor } from '../access/roles'
 import { copy, label } from '../i18n/shared'
 import { enforceUploadLimits } from './uploadLimits'
 import { uploadedFileHeaders } from './svgUploads'
+import { guardMediaDeletion } from './mediaDeleteGuard'
 
 const imageMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 
@@ -12,9 +13,9 @@ export const Media: CollectionConfig = {
   admin: { useAsTitle: 'alt', group: 'Content', description: label(
     'PNG, JPEG, WebP, or AVIF only; SVG uploads are disabled. Up to 10 MiB, 40 million total pixels across all frames, and 12,000 pixels per side in each frame.',
     '支持 PNG、JPEG、WebP、AVIF，不支持上传 SVG。图片最大 10 MiB，所有帧合计不超过 4000 万像素，单帧任一边不超过 12000 像素。',
-  ) },
+  ), components: { beforeListTable: ['/components/MediaReferences#ListMediaReferences'] } },
   access: { read: publishedOrEditor, create: isEditor, update: isEditor, delete: isEditor },
-  hooks: { beforeOperation: [enforceUploadLimits] },
+  hooks: { beforeOperation: [enforceUploadLimits], beforeDelete: [guardMediaDeletion] },
   upload: {
     staticDir: path.resolve(process.cwd(), 'media'),
     pasteURL: false,
@@ -28,6 +29,10 @@ export const Media: CollectionConfig = {
     adminThumbnail: 'thumbnail',
   },
   fields: [
+    { name: 'mediaReferences', type: 'ui', label: label('Image references', '图片引用'), admin: {
+      disableListColumn: true, disableBulkEdit: true,
+      components: { Field: '/components/MediaReferences#DocumentMediaReferences' },
+    } },
     {
       name: 'mimeType', type: 'text', hasMany: false, admin: { hidden: true, readOnly: true },
       // Payload also validates stored MIME on ordinary metadata edits. Allow an unchanged

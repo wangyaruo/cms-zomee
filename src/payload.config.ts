@@ -28,6 +28,7 @@ import { snapshotEndpoint } from './endpoints/snapshot'
 import { createReleaseEndpoint } from './endpoints/releases'
 import { contentTrashImpactEndpoint } from './endpoints/trashImpact'
 import { uploadRequestLimits } from './collections/uploadLimits'
+import { mediaReferencesEndpoint } from './endpoints/mediaReferences'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -53,7 +54,7 @@ export default buildConfig({
   collections: [Users, Media, Categories, Products, Posts, Faqs, Releases, Pages, Applications, Solutions, Resources, NavigationMenus, LegalPages, SitePages, Documents, PrivateDocuments]
     .map((collection) => localizeCollection(contentTrashCollections.has(collection.slug) ? withContentTrash(collection) : collection)),
   globals: [SiteSettings].map(localizeGlobal),
-  endpoints: [snapshotEndpoint, createReleaseEndpoint, contentTrashImpactEndpoint],
+  endpoints: [snapshotEndpoint, createReleaseEndpoint, contentTrashImpactEndpoint, mediaReferencesEndpoint],
   localization: {
     defaultLocale: 'en',
     fallback: true,
